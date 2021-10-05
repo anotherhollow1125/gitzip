@@ -83,7 +83,9 @@ fn gitzip() -> CliResult {
 }
 
 fn gitunzip() -> CliResult {
-    let target = format!("{}_git.zip", env::current_dir()?.to_string_lossy());
+    let curdir = env::current_dir()?;
+    let curdir_name = curdir.file_name().unwrap().to_string_lossy();
+    let target = format!("{}_git.zip", curdir_name);
 
     if !Path::new(&target).exists() {
         return Err(failure::err_msg("target not found.").into());
@@ -101,7 +103,9 @@ fn gitunzip() -> CliResult {
         }
         "linux" => {
             println!("linux");
-            std::process::Command::new("unzip").arg(&target).spawn()?;
+            std::process::Command::new("unzip")
+                .args(["-o", &target])
+                .spawn()?;
         }
         _ => (),
     }
